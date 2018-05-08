@@ -18,51 +18,48 @@ public class Customer {
     }
 
     public String statement() {
-        double totalAmount = 0;
-        int frequentRenterPoints = 0;
         Enumeration rentals = _rentals.elements();
         String result = "Rental Record for " + getName() + "\n";
         while (rentals.hasMoreElements()) {
-            double thisAmount = 0;
             Rental each = (Rental) rentals.nextElement();
-
-            thisAmount = amountFor(each);
-
-            frequentRenterPoints++;
-            if ((each.get_movie().get_priceCode() == Movie.NEW_RELEASE) && each.get_daysRented() > 1) {
-                frequentRenterPoints++;
-            }
-
-            result += "\t" + each.get_movie().get_title() + "\t" + String.valueOf(thisAmount) + "\n";
-            totalAmount += thisAmount;
+            result += "\t" + each.get_movie().get_title() + "\t" + String.valueOf(each.getCharge()) + "\n";
         }
 
-        result += "Amount owed is " + String.valueOf(totalAmount) + "\n";
-        result += "You earned " + String.valueOf(frequentRenterPoints) + " frequent renter points";
+        result += "Amount owed is " + String.valueOf(getTotalCharge()) + "\n";
+        result += "You earned " + String.valueOf(getTotalFrequentRenterPoints()) + " frequent renter points";
         return result;
 
     }
 
-    private double amountFor(Rental aRental) {
+    public String htmlStatement() {
+        Enumeration rentals = _rentals.elements();
+        String result = "<h1>Rentals for <em>" +getName() + "</em></h1><p>\n";
+        while (rentals.hasMoreElements()) {
+            Rental each = (Rental) rentals.nextElement();
+            result += each.get_movie().get_title() + ": " +
+                    String.valueOf(each.getCharge()) + "<br>\n";
+        }
+        return result;
+    }
+
+    private double getTotalCharge() {
         double result = 0;
-        switch (aRental.get_movie().get_priceCode()) {
-            case Movie.REGULAR:
-                result += 2;
-                if (aRental.get_daysRented() > 2) {
-                    result += (aRental.get_daysRented() - 2) * 1.5;
-                }
-                break;
-            case Movie.NEW_RELEASE:
-                result += aRental.get_daysRented() * 3;
-                break;
-            case Movie.CHILDRENS:
-                result += 1.5;
-                if (aRental.get_daysRented() > 3) {
-                    result += (aRental.get_daysRented() - 3) * 1.5;
-                    break;
-                }
-
+        Enumeration rentals = _rentals.elements();
+        while (rentals.hasMoreElements()) {
+           Rental each = (Rental) rentals.nextElement();
+           result += each.getCharge();
         }
         return result;
     }
+
+    private int getTotalFrequentRenterPoints() {
+       int result = 0;
+       Enumeration rentals = _rentals.elements();
+       while (rentals.hasMoreElements()) {
+           Rental each = (Rental) rentals.nextElement();
+           result += each.getFrequentRenterPoints();
+       }
+       return result;
+    }
+
 }
